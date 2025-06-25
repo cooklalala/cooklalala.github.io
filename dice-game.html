@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>经典摇色子游戏</title>
+  <style>
+    /* 基础样式重置与全局设置 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #121212, #2a2a2a);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #f0f0f0;
+    }
+
+    .game-container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6),
+                  0 0 15px rgba(124, 58, 237, 0.4),
+                  0 0 5px rgba(212, 175, 55, 0.3);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 标题区域样式 */
+    .header {
+      background: linear-gradient(90deg, #7C3AED, #9333EA, #A855F7);
+      padding: 15px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+                                 transparent,
+                                 rgba(255, 255, 255, 0.2),
+                                 transparent);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      to {
+        left: 100%;
+      }
+    }
+
+    .header h1 {
+      font-size: 18px;
+      text-shadow: 0 0 5px #fff, 0 0 10px #7C3AED;
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 控制面板样式 */
+    .controls {
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(20, 20, 20, 0.5);
+      border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+    }
+
+    @media (max-width: 480px) {
+      .controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control-label {
+      font-size: 14px;
+      color: #ddd;
+      white-space: nowrap;
+    }
+
+    .dice-count {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .dice-btn {
+      width: 30px;
+      height: 30px;
+      background: #1a1a1a;
+      color: #f0f0f0;
+      border: 1px solid rgba(124, 58, 237, 0.5);
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .dice-btn:hover {
+      background: #252525;
+      border-color: #7C3AED;
+      box-shadow: 0 0 5px rgba(124, 58, 237, 0.5);
+    }
+
+    .dice-btn:active {
+      transform: scale(0.95);
+    }
+
+    .dice-value {
+      width: 40px;
+      height: 30px;
+      background: #2a2a2a;
+      border: 1px solid rgba(124, 58, 237, 0.5);
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .shake-btn {
+      padding: 8px 15px;
+      background: linear-gradient(45deg, #D4AF37, #FBBF24);
+      color: #121212;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 0 5px rgba(212, 175, 55, 0.7),
+                  0 0 10px rgba(212, 175, 55, 0.5);
+      transition: all 0.2s;
+      width: auto;
+    }
+
+    @media (max-width: 480px) {
+      .shake-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .shake-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.9),
+                  0 0 20px rgba(212, 175, 55, 0.7);
+    }
+
+    .shake-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* 边界控制样式 */
+    .boundary-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .boundary-slider {
+      width: 100px;
+    }
+
+    /* 调试模式开关 */
+    .debug-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .debug-toggle {
+      position: relative;
+      width: 40px;
+      height: 20px;
+      background: #333;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .debug-toggle::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      top: 2px;
+      left: 2px;
+      transition: all 0.3s;
+    }
+
+    .debug-toggle.active {
+      background: #7C3AED;
+    }
+
+    .debug-toggle.active::after {
+      left: 22px;
+    }
+
+    /* 色盅与骰子区域样式 */
+    .game-area {
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      min-height: 200px;
+    }
+
+    .dice-container {
+      width: 100%;
+      max-width: 250px;
+      height: 250px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      perspective: 1000px;
+      transform: rotateX(15deg);
+    }
+
+    /* 边界指示器样式 */
+    .boundary-indicator {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 2px dashed rgba(124, 58, 237, 0.5);
+      border-radius: 8px;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+
+    /* 色盅样式 */
+    .dice-cup {
+      width: 160px;
+      height: 200px;
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      transform-style: preserve-3d;
+      z-index: 20; /* 增加色盅的z-index值 */
+      opacity: 1;
+    }
+
+    .cup-body {
+      width: 160px;
+      height: 160px;
+      background: linear-gradient(to bottom, #333, #111);
+      border: 3px solid #555;
+      border-radius: 50% 50% 20px 20px;
+      position: relative;
+      box-shadow:
+        inset 0 -10px 20px rgba(0, 0, 0, 0.5),
+        0 0 10px rgba(0, 0, 0, 0.5),
+        0 0 5px rgba(124, 58, 237, 0.3);
+      transform-style: preserve-3d;
+      opacity: 1;
+    }
+
+    .cup-body::before {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 36px;
+      background: linear-gradient(to bottom, #444, #222);
+      border: 3px solid #555;
+      border-radius: 50%;
+      border-bottom: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      transform-style: preserve-3d;
+    }
+
+    .cup-top {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 28px;
+      background: linear-gradient(to bottom, #666, #444);
+      border: 3px solid #555;
+      border-radius: 50%;
+      border-bottom: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      transform-style: preserve-3d;
+    }
+
+    .cup-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 100px;
+      background: rgba(124, 58, 237, 0.2);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.3s;
+      transform-style: preserve-3d;
+    }
+
+    .dice-cup:hover .cup-glow {
+      opacity: 1;
+    }
+
+    /* 3D骰子样式 */
+    .dice-3d {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      transform-style: preserve-3d;
+      transition: transform 0.05s;
+      will-change: transform;
+      z-index: 5; /* 降低骰子的z-index值 */
+      transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .face {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+      transition: all 0.1s;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #333;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    /* 点的位置 */
+    .top-left { top: 8px; left: 8px; }
+    .top-right { top: 8px; right: 8px; }
+    .center { top: 16px; left: 16px; }
+    .middle-left { top: 16px; left: 8px; }
+    .middle-right { top: 16px; right: 8px; }
+    .bottom-left { bottom: 8px; left: 8px; }
+    .bottom-right { bottom: 8px; right: 8px; }
+
+    /* 每个面的3D位置 */
+    .face-1 { transform: translateZ(20px); }
+    .face-2 { transform: rotateY(180deg) translateZ(20px); }
+    .face-3 { transform: rotateY(90deg) translateZ(20px); }
+    .face-4 { transform: rotateY(-90deg) translateZ(20px); }
+    .face-5 { transform: rotateX(90deg) translateZ(20px); }
+    .face-6 { transform: rotateX(-90deg) translateZ(20px); }
+
+    /* 结果显示区域 */
+    .result-display {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 300px;
+      padding: 10px 15px;
+      background: rgba(20, 20, 20, 0.7);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 16px;
+      min-height: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .result-value {
+      color: #D4AF37;
+      font-weight: bold;
+      margin-left: 5px;
+      text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+    }
+
+    .result-dice {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .result-dice-face {
+      width: 30px;
+      height: 30px;
+      background: #fff;
+      border-radius: 3px;
+      position: relative;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.3s ease-out;
+    }
+
+    .result-dice-face.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .result-dice-dot {
+      width: 6px;
+      height: 6px;
+      background: #333;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    /* 骰子碰撞特效 */
+    .dice-collision {
+      animation: collision-effect 0.2s ease-out;
+    }
+
+    @keyframes collision-effect {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* 调试标签样式 */
+    .debug-label {
+      position: absolute;
+      color: white;
+      font-size: 10px;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 2px 4px;
+      border-radius: 3px;
+      z-index: 10; /* 确保调试标签显示在最上层 */
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 480px) {
+      .game-container {
+        border-radius: 10px;
+      }
+
+      .header h1 {
+        font-size: 14px;
+      }
+
+      .dice-container {
+        height: 200px;
+        max-width: 200px;
+        transform: rotateX(20deg);
+      }
+
+      .dice-cup {
+        width: 120px;
+        height: 160px;
+        top: -160px;
+        z-index: 20; /* 移动端也要保持色盅z-index */
+      }
+
+      .cup-body {
+        width: 120px;
+        height: 120px;
+      }
+
+      .cup-body::before {
+        width: 90px;
+        height: 25px;
+        top: -12px;
+      }
+
+      .cup-top {
+        width: 100px;
+        height: 20px;
+        top: -20px;
+      }
+
+      .dice-3d {
+        width: 30px;
+        height: 30px;
+        z-index: 5; /* 移动端骰子z-index */
+      }
+
+      .face {
+        width: 30px;
+        height: 30px;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+      }
+
+      /* 调整移动端点的位置 */
+      .top-left { top: 6px; left: 6px; }
+      .top-right { top: 6px; right: 6px; }
+      .center { top: 12px; left: 12px; }
+      .middle-left { top: 12px; left: 6px; }
+      .middle-right { top: 12px; right: 6px; }
+      .bottom-left { bottom: 6px; left: 6px; }
+      .bottom-right { bottom: 6px; right: 6px; }
+
+      /* 调整移动端面的3D位置 */
+      .face-1 { transform: translateZ(15px); }
+      .face-2 { transform: rotateY(180deg) translateZ(15px); }
+      .face-3 { transform: rotateY(90deg) translateZ(15px); }
+      .face-4 { transform: rotateY(-90deg) translateZ(15px); }
+      .face-5 { transform: rotateX(90deg) translateZ(15px); }
+      .face-6 { transform: rotateX(-90deg) translateZ(15px); }
+
+      .result-dice-face {
+        width: 25px;
+        height: 25px;
+      }
+
+      .result-dice-dot {
+        width: 5px;
+        height: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="header">
+      <h1>经典摇色子游戏</h1>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <div class="control-label">骰子数量:</div>
+        <div class="dice-count">
+          <div class="dice-btn" id="decrease-dice">-</div>
+          <div class="dice-value" id="dice-count">3</div>
+          <div class="dice-btn" id="increase-dice">+</div>
+        </div>
+      </div>
+
+      <div class="control-group boundary-control">
+        <div class="control-label">边界大小:</div>
+        <input type="range" class="boundary-slider" id="boundary-slider" min="0.5" max="1" step="0.05" value="0.8">
+        <div class="dice-value" id="boundary-value">80%</div>
+      </div>
+
+      <div class="control-group debug-control">
+        <div class="control-label">调试模式:</div>
+        <div class="debug-toggle" id="debug-toggle"></div>
+      </div>
+
+      <button class="shake-btn" id="shake-btn">
+        <i class="fa fa-random"></i> 摇一摇
+      </button>
+    </div>
+
+    <div class="game-area">
+      <div class="dice-container" id="dice-container">
+        <div class="boundary-indicator" id="boundary-indicator"></div>
+        <div class="dice-cup" id="dice-cup">
+          <div class="cup-body"></div>
+          <div class="cup-top"></div>
+          <div class="cup-glow"></div>
+        </div>
+        <!-- 骰子将通过JS动态生成 -->
+      </div>
+
+      <div class="result-display" id="result-display">
+        <span>点击摇一摇查看结果</span>
+        <div class="result-dice" id="result-dice"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 获取DOM元素
+      const diceCup = document.getElementById('dice-cup');
+      const diceContainer = document.getElementById('dice-container');
+      const diceCountEl = document.getElementById('dice-count');
+      const increaseDice = document.getElementById('increase-dice');
+      const decreaseDice = document.getElementById('decrease-dice');
+      const shakeBtn = document.getElementById('shake-btn');
+      const resultDisplay = document.getElementById('result-display');
+      const cupBody = document.querySelector('.cup-body');
+      const resultDice = document.getElementById('result-dice');
+      const boundarySlider = document.getElementById('boundary-slider');
+      const boundaryValue = document.getElementById('boundary-value');
+      const boundaryIndicator = document.getElementById('boundary-indicator');
+      const debugToggle = document.getElementById('debug-toggle');
+
+      // 初始设置
+      let diceCount = 3;
+      let isShaking = false;
+      let diceElements = [];
+      let animationFrameId = null;
+      let shakeStartTime = 0;
+      let cupVisible = true;
+      let boundaryScale = 0.8; // 默认边界大小为容器的80%
+      const diceSize = 40; // 骰子大小，用于碰撞检测
+      const diceRadius = diceSize / 2; // 骰子碰撞半径
+      const containerPadding = 10; // 容器内边距，防止骰子太靠近边缘
+      window.DEBUG_MODE = false; // 默认关闭调试模式
+
+      // 调试模式切换
+      debugToggle.addEventListener('click', function() {
+        window.DEBUG_MODE = !window.DEBUG_MODE;
+        this.classList.toggle('active', window.DEBUG_MODE);
+
+        // 重新生成骰子以应用调试模式
+        if (!isShaking) {
+          generateDice();
+        }
+      });
+
+      // 更新边界显示
+      function updateBoundary() {
+        const containerWidth = diceContainer.clientWidth;
+        const containerHeight = diceContainer.clientHeight;
+        const width = containerWidth * boundaryScale;
+        const height = containerHeight * boundaryScale;
+
+        boundaryIndicator.style.width = `${width}px`;
+        boundaryIndicator.style.height = `${height}px`;
+        boundaryIndicator.style.margin = `${(containerHeight - height) / 2}px 0 0 ${(containerWidth - width) / 2}px`;
+      }
+
+      // 生成骰子
+      function generateDice() {
+        // 清除现有骰子
+        diceElements.forEach(dice => {
+          if (dice.parentNode) {
+            dice.parentNode.removeChild(dice);
+          }
+        });
+        diceElements = [];
+
+        // 生成新骰子
+        for (let i = 0; i < diceCount; i++) {
+          const dice = document.createElement('div');
+          dice.className = 'dice-3d';
+
+          // 创建骰子的六个面
+          for (let face = 1; face <= 6; face++) {
+            const faceElement = document.createElement('div');
+            faceElement.className = `face face-${face}`;
+
+            // 根据点数添加相应的点
+            addDotsToFace(faceElement, face);
+
+            dice.appendChild(faceElement);
+          }
+
+          // 在生成骰子时添加调试信息
+          if (window.DEBUG_MODE) {
+            const debugLabel = document.createElement('div');
+            debugLabel.className = 'debug-label';
+            debugLabel.style.position = 'absolute';
+            debugLabel.style.color = 'white';
+            debugLabel.style.fontSize = '10px';
+            debugLabel.style.pointerEvents = 'none';
+            debugLabel.style.zIndex = '10'; // 确保调试标签显示在最上层
+            dice.appendChild(debugLabel);
+          }
+
+          diceContainer.appendChild(dice);
+          diceElements.push(dice);
+        }
+
+        // 初始化骰子位置，确保不重叠
+        resetDicePositions();
+      }
+
+      // 重置骰子位置到色盅内，避免重叠
+      function resetDicePositions() {
+        const positions = [];
+        const containerSize = Math.min(diceContainer.clientWidth, diceContainer.clientHeight) * boundaryScale - diceSize - containerPadding * 2;
+        const minDistance = diceSize * 1.5; // 骰子之间的最小距离
+
+        // 生成不重叠的位置
+        for (let i = 0; i < diceCount; i++) {
+          let posX, posY;
+          let validPosition = false;
+          let attempts = 0;
+
+          // 尝试找到一个不与其他骰子重叠的位置
+          while (!validPosition && attempts < 100) {
+            posX = (Math.random() * containerSize) - (containerSize / 2);
+            posY = (Math.random() * containerSize) - (containerSize / 2);
+
+            validPosition = true;
+
+            // 检查与已有的位置是否重叠
+            for (let j = 0; j < positions.length; j++) {
+              const existingPos = positions[j];
+              const dx = posX - existingPos.x;
+              const dy = posY - existingPos.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+
+              if (distance < minDistance) {
+                validPosition = false;
+                break;
+              }
+            }
+
+            attempts++;
+          }
+
+          // 如果尝试多次仍未找到有效位置，使用网格布局
+          if (!validPosition) {
+            const gridSize = Math.ceil(Math.sqrt(diceCount));
+            const gridCellSize = containerSize / gridSize;
+            const row = Math.floor(i / gridSize);
+            const col = i % gridSize;
+
+            posX = (col * gridCellSize + gridCellSize / 2) - containerSize / 2;
+            posY = (row * gridCellSize + gridCellSize / 2) - containerSize / 2;
+          }
+
+          positions.push({ x: posX, y: posY });
+
+          // 设置骰子位置
+          const dice = diceElements[i];
+          dice.style.left = `${posX}px`;
+          dice.style.top = `${posY}px`;
+          dice.style.opacity = '1';
+          dice.style.transform = 'scale(1)';
+
+          // 设置初始点数
+          const pip = Math.floor(Math.random() * 6) + 1;
+          setDiceValue(dice, pip);
+
+          // 确保骰子有不同的z-index，基于它们的位置（但不再设置为1000+）
+          dice.style.zIndex = 5; // 统一设置为5，确保小于色盅的20
+        }
+      }
+
+      // 为骰子面添加点数
+      function addDotsToFace(faceElement, faceNumber) {
+        faceElement.innerHTML = ''; // 清空内容
+
+        // 根据点数添加相应的点
+        switch(faceNumber) {
+          case 1:
+            faceElement.innerHTML = '<div class="dot"></div>';
+            break;
+          case 2:
+            faceElement.innerHTML = `
+              <div class="dot top-left"></div>
+              <div class="dot bottom-right"></div>
+            `;
+            break;
+          case 3:
+            faceElement.innerHTML = `
+              <div class="dot top-left"></div>
+              <div class="dot center"></div>
+              <div class="dot bottom-right"></div>
+            `;
+            break;
+          case 4:
+            faceElement.innerHTML = `
+              <div class="dot top-left"></div>
+              <div class="dot top-right"></div>
+              <div class="dot bottom-left"></div>
+              <div class="dot bottom-right"></div>
+            `;
+            break;
+          case 5:
+            faceElement.innerHTML = `
+              <div class="dot top-left"></div>
+              <div class="dot top-right"></div>
+              <div class="dot center"></div>
+              <div class="dot bottom-left"></div>
+              <div class="dot bottom-right"></div>
+            `;
+            break;
+          case 6:
+            faceElement.innerHTML = `
+              <div class="dot top-left"></div>
+              <div class="dot top-right"></div>
+              <div class="dot middle-left"></div>
+              <div class="dot middle-right"></div>
+              <div class="dot bottom-left"></div>
+              <div class="dot bottom-right"></div>
+            `;
+            break;
+        }
+      }
+
+      // 设置骰子显示特定点数
+      function setDiceValue(dice, value) {
+        // 根据点数设置旋转角度
+        let rotationX = 0;
+        let rotationY = 0;
+
+        switch(value) {
+          case 1:
+            rotationX = 0;
+            rotationY = 0;
+            break;
+          case 2:
+            rotationX = 0;
+            rotationY = 180;
+            break;
+          case 3:
+            rotationX = 0;
+            rotationY = 90;
+            break;
+          case 4:
+            rotationX = 0;
+            rotationY = -90;
+            break;
+          case 5:
+            rotationX = 90;
+            rotationY = 0;
+            break;
+          case 6:
+            rotationX = -90;
+            rotationY = 0;
+            break;
+        }
+
+        // 添加一些随机旋转，使骰子看起来更自然
+        rotationX += (Math.random() * 10 - 5);
+        rotationY += (Math.random() * 10 - 5);
+
+        // 调整骰子角度，使其更容易被看到
+        rotationX += 15;
+        rotationY += 5;
+
+        dice.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+        // 存储当前骰子值，以便正确计算结果
+        dice.dataset.value = value;
+      }
+
+      // 调整最终骰子角度，使其更容易被看到
+      function setFinalDiceValue(dice, value) {
+        // 根据点数设置旋转角度
+        let rotationX = 0;
+        let rotationY = 0;
+
+        switch(value) {
+          case 1:
+            rotationX = 0;
+            rotationY = 0;
+            break;
+          case 2:
+            rotationX = 0;
+            rotationY = 180;
+            break;
+          case 3:
+            rotationX = 0;
+            rotationY = 90;
+            break;
+          case 4:
+            rotationX = 0;
+            rotationY = -90;
+            break;
+          case 5:
+            rotationX = 90;
+            rotationY = 0;
+            break;
+          case 6:
+            rotationX = -90;
+            rotationY = 0;
+            break;
+        }
+
+        // 添加一些随机旋转，使骰子看起来更自然
+        rotationX += (Math.random() * 10 - 5);
+        rotationY += (Math.random() * 10 - 5);
+
+        // 调整骰子角度，使其更容易被看到
+        rotationX += 15;
+        rotationY += 5;
+
+        dice.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
+        // 存储当前骰子值，以便正确计算结果
+        dice.dataset.value = value;
+      }
+
+      // 检测两个骰子之间的碰撞
+      function checkCollision(diceA, diceB) {
+        const posA = {
+          x: parseFloat(diceA.style.left),
+          y: parseFloat(diceA.style.top)
+        };
+
+        const posB = {
+          x: parseFloat(diceB.style.left),
+          y: parseFloat(diceB.style.top)
+        };
+
+        // 计算两个骰子之间的距离
+        const dx = posB.x - posA.x;
+        const dy = posB.y - posA.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // 如果距离小于两倍的骰子半径，则发生碰撞
+        return distance < diceSize;
+      }
+
+      // 处理骰子碰撞反弹
+      function handleCollision(diceA, diceB) {
+        const posA = {
+          x: parseFloat(diceA.style.left),
+          y: parseFloat(diceA.style.top)
+        };
+
+        const posB = {
+          x: parseFloat(diceB.style.left),
+          y: parseFloat(diceB.style.top)
+        };
+
+        // 计算碰撞法线方向
+        let dx = posB.x - posA.x;
+        let dy = posB.y - posA.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+
+        // 如果骰子重叠，稍微分开它们
+        if (distance < diceSize) {
+          const overlap = (diceSize - distance) / 2;
+
+          // 防止除零错误
+          if (distance > 0) {
+            const nx = dx / distance;
+            const ny = dy / distance;
+
+            // 分开骰子
+            posA.x -= nx * overlap;
+            posA.y -= ny * overlap;
+            posB.x += nx * overlap;
+            posB.y += ny * overlap;
+
+            // 更新骰子位置
+            diceA.style.left = `${posA.x}px`;
+            diceA.style.top = `${posA.y}px`;
+            diceB.style.left = `${posB.x}px`;
+            diceB.style.top = `${posB.y}px`;
+
+            // 添加碰撞动画效果
+            diceA.classList.add('dice-collision');
+            diceB.classList.add('dice-collision');
+
+            setTimeout(() => {
+              diceA.classList.remove('dice-collision');
+              diceB.classList.remove('dice-collision');
+            }, 200);
+          }
+        }
+      }
+
+      // 检测并处理边界碰撞
+      function checkBoundaryCollision(dice) {
+        const containerWidth = diceContainer.clientWidth;
+        const containerHeight = diceContainer.clientHeight;
+        const posX = parseFloat(dice.style.left);
+        const posY = parseFloat(dice.style.top);
+
+        // 计算边界
+        const boundaryWidth = containerWidth * boundaryScale;
+        const boundaryHeight = containerHeight * boundaryScale;
+        const leftBound = (containerWidth - boundaryWidth) / 2 + containerPadding;
+        const rightBound = leftBound + boundaryWidth - containerPadding - diceSize;
+        const topBound = (containerHeight - boundaryHeight) / 2 + containerPadding;
+        const bottomBound = topBound + boundaryHeight - containerPadding - diceSize;
+
+        let collision = false;
+
+        // 左边界碰撞
+        if (posX < leftBound) {
+          dice.style.left = `${leftBound}px`;
+          collision = true;
+        }
+        // 右边界碰撞
+        else if (posX > rightBound) {
+          dice.style.left = `${rightBound}px`;
+          collision = true;
+        }
+
+        // 上边界碰撞
+        if (posY < topBound) {
+          dice.style.top = `${topBound}px`;
+          collision = true;
+        }
+        // 下边界碰撞
+        else if (posY > bottomBound) {
+          dice.style.top = `${bottomBound}px`;
+          collision = true;
+        }
+
+        // 如果发生碰撞，添加碰撞效果
+        if (collision && window.DEBUG_MODE) {
+          dice.classList.add('dice-collision');
+          setTimeout(() => {
+            dice.classList.remove('dice-collision');
+          }, 200);
+        }
+
+        return collision;
+      }
+
+      // 骰子摇动动画
+      function shakeDice(timestamp) {
+        if (!shakeStartTime) {
+          shakeStartTime = timestamp;
+        }
+
+        const elapsed = timestamp - shakeStartTime;
+        const duration = 2000; // 摇动持续时间，毫秒
+
+        // 计算动画进度（0-1之间）
+        let progress = Math.min(elapsed / duration, 1);
+
+        // 使用缓动函数使动画更自然
+        const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+
+        // 更新色盅位置
+        const cupY = -200 + (200 * easeOutProgress);
+        diceCup.style.top = `${cupY}px`;
+
+        // 如果色盅已经完全放下，开始显示骰子
+        if (cupY >= 0 && cupVisible) {
+          cupVisible = false;
+          // 显示骰子
+          diceElements.forEach(dice => {
+            dice.style.opacity = '1';
+          });
+        }
+
+        // 摇动骰子
+        diceElements.forEach(dice => {
+          // 随机移动骰子
+          const shakeIntensity = 100 * (1 - easeOutProgress);
+          const moveX = (Math.random() * 2 - 1) * shakeIntensity;
+          const moveY = (Math.random() * 2 - 1) * shakeIntensity;
+
+          // 获取当前位置
+          let currentX = parseFloat(dice.style.left);
+          let currentY = parseFloat(dice.style.top);
+
+          // 计算新位置
+          let newX = currentX + moveX;
+          let newY = currentY + moveY;
+
+          // 应用新位置
+          dice.style.left = `${newX}px`;
+          dice.style.top = `${newY}px`;
+
+          // 随机旋转骰子
+          const rotateX = Math.random() * 360;
+          const rotateY = Math.random() * 360;
+          dice.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+          // 更新调试信息
+          if (window.DEBUG_MODE) {
+            const debugLabel = dice.querySelector('.debug-label');
+            if (debugLabel) {
+              debugLabel.textContent = `x:${Math.round(newX)}, y:${Math.round(newY)}`;
+              debugLabel.style.left = `${diceSize}px`;
+              debugLabel.style.top = `0px`;
+            }
+          }
+
+          // 检测并处理边界碰撞
+          checkBoundaryCollision(dice);
+
+          // 检测并处理骰子间碰撞
+          for (let i = 0; i < diceElements.length; i++) {
+            if (diceElements[i] !== dice) {
+              if (checkCollision(dice, diceElements[i])) {
+                handleCollision(dice, diceElements[i]);
+              }
+            }
+          }
+        });
+
+        // 如果动画未完成，继续下一帧
+        if (progress < 1) {
+          animationFrameId = requestAnimationFrame(shakeDice);
+        } else {
+          // 动画完成，停止动画并显示结果
+          isShaking = false;
+          showResult();
+
+          // 重置色盅位置
+          setTimeout(() => {
+            diceCup.style.top = `-200px`;
+            cupVisible = true;
+          }, 1000);
+        }
+      }
+
+      // 显示结果
+      function showResult() {
+        // 为每个骰子设置最终值
+        const results = [];
+        diceElements.forEach(dice => {
+          const value = Math.floor(Math.random() * 6) + 1;
+          setFinalDiceValue(dice, value);
+          results.push(value);
+        });
+        console.log(results,'看看结果');
+
+
+        // 计算总点数
+        const total = results.reduce((sum, value) => sum + value, 0);
+
+        // 更新结果显示
+        resultDisplay.innerHTML = `
+          <span>总点数: <span class="result-value">${total}</span></span>
+          <div class="result-dice" id="result-dice"></div>
+        `;
+
+        const resultDiceContainer = document.getElementById('result-dice');
+
+        // 显示每个骰子的结果
+        results.forEach((value, index) => {
+          setTimeout(() => {
+            const diceFace = document.createElement('div');
+            diceFace.className = 'result-dice-face';
+
+            // 根据点数添加相应的点
+            let dotsHtml = '';
+            switch(value) {
+              case 1:
+                dotsHtml = '<div class="result-dice-dot"></div>';
+                break;
+              case 2:
+                dotsHtml = `
+                  <div class="result-dice-dot top-left"></div>
+                  <div class="result-dice-dot bottom-right"></div>
+                `;
+                break;
+              case 3:
+                dotsHtml = `
+                  <div class="result-dice-dot top-left"></div>
+                  <div class="result-dice-dot center"></div>
+                  <div class="result-dice-dot bottom-right"></div>
+                `;
+                break;
+              case 4:
+                dotsHtml = `
+                  <div class="result-dice-dot top-left"></div>
+                  <div class="result-dice-dot top-right"></div>
+                  <div class="result-dice-dot bottom-left"></div>
+                  <div class="result-dice-dot bottom-right"></div>
+                `;
+                break;
+              case 5:
+                dotsHtml = `
+                  <div class="result-dice-dot top-left"></div>
+                  <div class="result-dice-dot top-right"></div>
+                  <div class="result-dice-dot center"></div>
+                  <div class="result-dice-dot bottom-left"></div>
+                  <div class="result-dice-dot bottom-right"></div>
+                `;
+                break;
+              case 6:
+                dotsHtml = `
+                  <div class="result-dice-dot top-left"></div>
+                  <div class="result-dice-dot top-right"></div>
+                  <div class="result-dice-dot middle-left"></div>
+                  <div class="result-dice-dot middle-right"></div>
+                  <div class="result-dice-dot bottom-left"></div>
+                  <div class="result-dice-dot bottom-right"></div>
+                `;
+                break;
+            }
+
+            diceFace.innerHTML = dotsHtml;
+            resultDiceContainer.appendChild(diceFace);
+
+            // 添加显示动画
+            setTimeout(() => {
+              diceFace.classList.add('show');
+            }, 50);
+
+          }, index * 200); // 错开每个骰子的显示时间
+        });
+      }
+
+      // 增加骰子数量
+      increaseDice.addEventListener('click', function() {
+        if (!isShaking && diceCount < 6) {
+          diceCount++;
+          diceCountEl.textContent = diceCount;
+          generateDice();
+        }
+      });
+
+      // 减少骰子数量
+      decreaseDice.addEventListener('click', function() {
+        if (!isShaking && diceCount > 1) {
+          diceCount--;
+          diceCountEl.textContent = diceCount;
+          generateDice();
+        }
+      });
+
+      // 摇动按钮点击事件
+      shakeBtn.addEventListener('click', function() {
+        if (!isShaking) {
+          isShaking = true;
+          shakeStartTime = 0;
+
+          // 重置骰子位置
+          resetDicePositions();
+
+          // 隐藏结果
+          resultDisplay.innerHTML = '<span>正在摇动...</span>';
+
+          // 开始摇动动画
+          animationFrameId = requestAnimationFrame(shakeDice);
+        }
+      });
+
+      // 边界滑块事件
+      boundarySlider.addEventListener('input', function() {
+        boundaryScale = parseFloat(this.value);
+        boundaryValue.textContent = `${Math.round(boundaryScale * 100)}%`;
+        updateBoundary();
+
+        // 如果不在摇动状态，重新生成骰子以适应新边界
+        if (!isShaking) {
+          generateDice();
+        }
+      });
+
+      // 色盅点击事件
+      diceCup.addEventListener('click', function() {
+        if (!isShaking) {
+          // 模拟摇动色盅但不显示结果
+          diceCup.style.top = '0px';
+
+          setTimeout(() => {
+            diceCup.style.top = '-200px';
+          }, 500);
+        }
+      });
+
+      // 窗口大小变化时更新边界
+      window.addEventListener('resize', function() {
+        updateBoundary();
+
+        // 如果不在摇动状态，重新生成骰子以适应新边界
+        if (!isShaking) {
+          generateDice();
+        }
+      });
+
+      // 初始化游戏
+      updateBoundary();
+      generateDice();
+    });
+  </script>
+</body>
+</html>
